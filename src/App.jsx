@@ -1,19 +1,23 @@
 // import logo from './logo.svg';
-// import bliss from './assets/bliss.jpeg';
+import bliss from './assets/bliss.jpeg';
+import minesweeper_icon from './assets/minesweeper/minesweeper-icon.png';
 import { useEffect, useRef, useState } from 'react';
 import './App.scss';
-
 import { useDrag } from '@use-gesture/react';
+import Icon from './components/Icon';
+import Window from './components/Window/Window';
+import Minesweeper from './components/Minesweeper/Minesweeper';
+import Taskbar from './components/Taskbar/Taskbar';
 
 function App() {
-  const [grid, setGrid] = useState(null);
   const [windowCoords, setWindowCoords] = useState([10, 10]);
   const window_ref = useRef(null);
+  const background_ref = useRef(null);
+  const [selectionCoords, setSelectionCoords] = useState(null);
+  const [selectionSize, setSelectionSize] = useState(null);
 
-  const rows = 16,
-    cols = 16,
-    bombs = 25,
-    cell_size = 25;
+  const cols = 16,
+    cell_size = 16;
 
   const bind = useDrag(
     (e) => {
@@ -22,230 +26,93 @@ function App() {
         windowCoords[1] + e.delta[1],
       ]);
     },
-    { bounds: document.body }
+    { bounds: background_ref }
   );
 
-  const clickCell = (row, col) => {
-    if (grid[row][col].val === -2) formatGrid(row, col);
-    if (!(grid[row][col].open || grid[row][col].flagged)) {
-      const newGrid = [...grid];
-      openCell(newGrid, row, col);
-      setGrid(newGrid);
-    }
-  };
-  const openCell = (candidate_grid, row, col) => {
-    if (!candidate_grid[row][col].flagged) {
-      if (candidate_grid[row][col].val === 0) {
-        let stack = [[row, col]];
-        while (stack.length > 0) {
-          const [r, c] = stack.pop();
-          let cell = candidate_grid[r][c];
-          if (cell.val > -1 && !cell.open) {
-            cell.open = 1;
-            if (cell.val === 0) {
-              let neighbor_cells = getNeighbors(candidate_grid, r, c);
-              let zeroes = neighbor_cells.filter(
-                ([r, c]) =>
-                  candidate_grid[r][c].val !== -1 &&
-                  candidate_grid[r][c].open === 0
-              );
-              stack = stack.concat(zeroes);
-            }
-          }
-        }
-      } else candidate_grid[row][col].open = 1;
-    }
-  };
-
-  const flagCell = (row, col) => {
-    const newGrid = [...grid];
-    if (newGrid[row][col].flagged) newGrid[row][col].flagged = 0;
-    else newGrid[row][col].flagged = 1;
-    setGrid(newGrid);
-  };
-
-  const createEmptyGrid = (rows, cols) => {
-    const result = [];
-    for (let i = 0; i < rows; i++) {
-      let row = [];
-      for (let j = 0; j < cols; j++) {
-        row.push({
-          val: -2,
-          open: 0,
-          flagged: 0,
-        });
+  const bind2 = useDrag(
+    (e) => {
+      if (e.active && e.target === background_ref.current) {
+        // get the top left corner
+        let top_left = [
+          Math.min(e.initial[0], e.xy[0]),
+          Math.min(e.initial[1], e.xy[1]),
+        ];
+        // get the bottom right corner
+        let bottom_right = [
+          Math.max(e.initial[0], e.xy[0]),
+          Math.max(e.initial[1], e.xy[1]),
+        ];
+        // get the width and height
+        let width = bottom_right[0] - top_left[0];
+        let height = bottom_right[1] - top_left[1];
+        // set the selection size
+        setSelectionSize([width, height]);
+        // set the selection coordinates
+        setSelectionCoords([top_left[0], top_left[1]]);
+      } else {
+        setSelectionSize(null);
+        setSelectionCoords(null);
       }
-      result.push(row);
-    }
-    return result;
-  };
-  const formatGrid = (starting_row, starting_column) => {
-    const result = [...grid];
-    setBombs(result, bombs, starting_row * cols + starting_column);
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < cols; j++) {
-        if (result[i][j].val !== -1)
-          result[i][j].val = getMineCount(result, i, j);
-      }
-    }
-    setGrid(result);
-  };
-
-  const setBombs = (candidate_grid, bombs, starting_index = null) => {
-    let rows = candidate_grid.length;
-    let cols = candidate_grid[0].length;
-    let total_cells = rows * cols;
-    let bomb_indices = [];
-    if (bombs > total_cells) bombs = total_cells;
-    let survivable = bombs < total_cells;
-    if (survivable) {
-      while (bomb_indices.length < bombs) {
-        let next_index = Math.floor(Math.random() * total_cells);
-        if (
-          !bomb_indices.includes(next_index) &&
-          next_index !== starting_index
-        ) {
-          bomb_indices.push(next_index);
-        }
-      }
-    } else bomb_indices = [...Array(total_cells).keys()];
-    let result = bomb_indices.map((index) => [
-      Math.floor(index / cols),
-      index % cols,
-    ]);
-    result.forEach(([row, col]) => {
-      candidate_grid[row][col].val = -1;
-    });
-    return candidate_grid;
-  };
-
-  const getNeighbors = (candidate_grid, row, col) => {
-    let min_row = Math.max(row - 1, 0);
-    let max_row = Math.min(row + 1, candidate_grid.length - 1);
-    let min_col = Math.max(col - 1, 0);
-    let max_col = Math.min(col + 1, candidate_grid[0].length - 1);
-    let result = [];
-    for (let i = min_row; i <= max_row; i++) {
-      for (let j = min_col; j <= max_col; j++) {
-        if (i !== row || j !== col) {
-          result.push([i, j]);
-        }
-      }
-    }
-    return result;
-  };
-  const getMineCount = (candidate_grid, row, col) => {
-    let neighbor_coords = getNeighbors(candidate_grid, row, col);
-    let neighbor_cells = neighbor_coords.map(
-      ([row, col]) => candidate_grid[row][col]
-    );
-    let mine_count = neighbor_cells.filter((cell) => cell.val === -1).length;
-    return mine_count;
-  };
-
-  const getBorder = (cell) => {
-    if (cell.open === 1) {
-      return 'border-l border-t border-[#808080]';
-    }
-    return 'minesweeper-border-colors-outset border-[3px]';
-  };
-
-  const getCharacter = (cell) => {
-    if (cell.open) {
-      if (cell.val === -1) return '💣';
-      if (cell.val > 0) return cell.val;
-      return '';
-    } else if (cell.flagged) {
-      return '🚩';
-    }
-    return '';
-  };
-  const num_colors = {
-    1: '#0000fd',
-    2: '#017e00',
-    3: '#fe0000',
-    4: '#010180',
-    5: '#810101',
-    6: '#008080',
-    7: 'black',
-    8: '#808080',
-  };
+    },
+    { bounds: background_ref }
+  );
 
   useEffect(() => {
-    if (grid === null) {
-      setGrid(() => createEmptyGrid(16, 16));
-      setWindowCoords([
-        (document.body.offsetWidth -
+    setWindowCoords([
+      Math.max(
+        (background_ref.current.offsetWidth -
           (window_ref.current.offsetWidth + cols * cell_size)) /
           2,
-        (document.body.offsetHeight -
+        0
+      ),
+      Math.max(
+        (background_ref.current.offsetHeight -
           (window_ref.current.offsetHeight + cols * cell_size)) /
           2,
-      ]);
-    }
+        0
+      ),
+    ]);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div
-      className='relative flex h-full w-full flex-row'
-      style={{
-        backgroundImage: 'url(/assets/bliss.jpeg)',
-        backgroundSize: 'cover',
-      }}
-    >
+    <div className='flex h-full w-full flex-col'>
       <div
-        className='absolute flex flex-col'
+        {...bind2()}
+        ref={background_ref}
+        className='relative w-full flex-1'
         style={{
-          left: windowCoords[0],
-          top: windowCoords[1],
-          // transformOrigin: 'center center',
+          backgroundImage: `url(${bliss})`,
+          backgroundSize: 'cover',
+          touchAction: 'none',
         }}
-        ref={window_ref}
       >
+        <Icon
+          src={minesweeper_icon}
+          name={'Minesweeper'}
+          coords={[40, 40]}
+          selection={[selectionCoords, selectionSize]}
+        />
         <div
-          {...bind()}
-          className='h-[35px] w-full rounded-t-lg bg-[#0855dd]'
-          style={{ touchAction: 'none' }}
+          className='absolute h-10 w-10 border-2 border-blue-400 bg-blue-200 opacity-50'
+          style={{
+            display: selectionSize ? 'block' : 'none',
+            left: selectionCoords ? `${selectionCoords[0]}px` : 0,
+            top: selectionCoords ? `${selectionCoords[1]}px` : 0,
+            width: selectionSize ? `${selectionSize[0]}px` : 0,
+            height: selectionSize ? `${selectionSize[1]}px` : 0,
+          }}
         ></div>
-        <div className='flex flex-col border-4 border-[#0855dd] bg-[#ece9d8]'>
-          <div className='h-[25px]'></div>
-          <div className='flex w-full flex-col gap-2 border-l-4 border-t-4 border-white bg-[#c0c0c0] p-2'>
-            <div className='minesweeper-border-colors-inset h-[40px] border-2'></div>
-            <div
-              className='minesweeper-border-colors-inset grid border-4'
-              style={{
-                gridTemplateColumns: `repeat(${grid?.[0]?.length}, auto)`,
-              }}
-            >
-              {grid &&
-                grid.map((row, row_index) =>
-                  row.map((cell, col_index) => (
-                    <div
-                      className={`${getBorder(
-                        cell
-                      )} flex items-center justify-center text-xl font-extrabold`}
-                      style={{
-                        height: `${cell_size}px`,
-                        width: `${cell_size}px`,
-                        color: num_colors?.[cell.val] ?? 'black',
-                      }}
-                      key={`${row_index},${col_index}`}
-                      onClick={() => {
-                        clickCell(row_index, col_index);
-                      }}
-                      onContextMenu={(e) => {
-                        e.preventDefault();
-                        flagCell(row_index, col_index);
-                      }}
-                    >
-                      {getCharacter(cell)}
-                    </div>
-                  ))
-                )}
-            </div>
-          </div>
-        </div>
+        <Window
+          ref={window_ref}
+          windowCoords={windowCoords}
+          bind={bind}
+          icon={minesweeper_icon}
+          title={'Minesweeper'}
+        >
+          <Minesweeper />
+        </Window>
       </div>
+      <Taskbar />
     </div>
   );
 }
