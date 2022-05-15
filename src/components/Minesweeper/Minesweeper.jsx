@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Grid from './components/Grid/Grid';
 import ScoreBar from './components/ScoreBar/ScoreBar';
 import './Minesweeper.scss';
@@ -7,11 +7,21 @@ const Minesweeper = () => {
   const [grid, setGrid] = useState(null);
   const [seconds, setSeconds] = useState(0);
   const [status, setStatus] = useState('new');
+  const [mousedown, setMousedown] = useState(false);
+  const mouseup = () => setMousedown(false);
+  const play_area_ref = useRef(null);
 
   const reset = () => {
     setGrid(() => createEmptyGrid(16, 16));
-    setSeconds(0);
     setStatus('new');
+  };
+  const isPlaying = () => status === 'new' || status === 'started';
+  const checkWin = (candidate_grid, num_bombs) => {
+    let cells = candidate_grid.flat(1);
+    return (
+      cells.filter((cell) => cell.open === 1 && cell.val > -1).length ===
+      cells.length - num_bombs
+    );
   };
 
   function addSecond() {
@@ -34,15 +44,25 @@ const Minesweeper = () => {
 
   const rows = 16,
     cols = 16,
-    bombs = 40;
+    bombs = 2;
 
   const clickCell = (row, col) => {
-    if (grid[row][col].val === -2) formatGrid(row, col);
-    if (!(grid[row][col].open || grid[row][col].flagged)) {
-      const newGrid = [...grid];
-      openCell(newGrid, row, col);
-      setGrid(newGrid);
-      setStatus('started');
+    if (isPlaying()) {
+      if (grid[row][col].val === -2) formatGrid(row, col);
+      if (!(grid[row][col].open || grid[row][col].flagged)) {
+        const newGrid = [...grid];
+        openCell(newGrid, row, col);
+        setGrid(newGrid);
+        if (status === 'new') setStatus('started');
+        if (checkWin(grid, bombs)) {
+          for (let row of grid) {
+            for (let cell of row) {
+              if (cell.val === -1) cell.flagged = 1;
+            }
+          }
+          setStatus('won');
+        }
+      }
     }
   };
   const openCell = (candidate_grid, row, col) => {
@@ -56,23 +76,38 @@ const Minesweeper = () => {
             cell.open = 1;
             if (cell.val === 0) {
               let neighbor_cells = getNeighbors(candidate_grid, r, c);
-              let zeroes = neighbor_cells.filter(
+              let unflagged_zeroes = neighbor_cells.filter(
                 ([r, c]) =>
                   candidate_grid[r][c].val !== -1 &&
-                  candidate_grid[r][c].open === 0
+                  candidate_grid[r][c].open === 0 &&
+                  candidate_grid[r][c].flagged === 0
               );
-              stack = stack.concat(zeroes);
+              stack = stack.concat(unflagged_zeroes);
             }
           }
         }
-      } else candidate_grid[row][col].open = 1;
+      } else {
+        candidate_grid[row][col].open = 1;
+        if (candidate_grid[row][col].val === -1) {
+          setStatus('lost');
+          candidate_grid[row][col].val = -2;
+          for (let row of candidate_grid) {
+            for (let cell of row) {
+              if (cell.flagged === 1 && cell.val !== -1) cell.val = -3;
+              if (cell.val < 0) cell.open = 1;
+            }
+          }
+        }
+      }
     }
   };
 
   const flagCell = (row, col) => {
-    const newGrid = [...grid];
-    newGrid[row][col].flagged = (newGrid[row][col].flagged + 1) % 3;
-    setGrid(newGrid);
+    if (isPlaying()) {
+      const newGrid = [...grid];
+      newGrid[row][col].flagged = (newGrid[row][col].flagged + 1) % 3;
+      setGrid(newGrid);
+    }
   };
 
   const createEmptyGrid = (rows, cols) => {
@@ -161,18 +196,33 @@ const Minesweeper = () => {
     if (grid === null) {
       setGrid(() => createEmptyGrid(16, 16));
     }
+    window.addEventListener('mouseup', mouseup);
+    return () => {
+      window.removeEventListener('mouseup', mouseup);
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className='flex h-full w-full flex-col'>
       {/* <div className='h-[20px]'></div> */}
-      <div className='flex w-full flex-col gap-[5px] border-l-[3px] border-t-[3px] border-[rgb(245,245,245)] bg-[#c0c0c0] p-[5px]'>
+      <div
+        className='flex w-full flex-col gap-[5px] border-l-[3px] border-t-[3px] border-[rgb(245,245,245)] bg-[#c0c0c0] p-[5px]'
+        onMouseDown={(e) => setMousedown(true)}
+        ref={play_area_ref}
+      >
         <ScoreBar
           mines_remaining={getRemainingMines()}
           seconds_elapsed={seconds}
           reset={reset}
+          status={status}
+          mousedown={mousedown}
         />
-        <Grid grid={grid} clickCell={clickCell} flagCell={flagCell} />
+        <Grid
+          grid={grid}
+          clickCell={clickCell}
+          flagCell={flagCell}
+          status={status}
+        />
       </div>
     </div>
   );

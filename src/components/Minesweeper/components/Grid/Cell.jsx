@@ -11,11 +11,10 @@ import {
   question,
   mine,
   mine_death,
-  checked,
   misflagged,
 } from '../../../../assets/minesweeper/cell';
 
-const Cell = ({ row, col, cell, clickCell, flagCell }) => {
+const Cell = ({ row, col, cell, clickCell, flagCell, status }) => {
   const cell_size = 16;
 
   const digits = {
@@ -31,7 +30,6 @@ const Cell = ({ row, col, cell, clickCell, flagCell }) => {
     '?': question,
     mine: mine,
     mine_death: mine_death,
-    checked: checked,
     misflagged: misflagged,
   };
 
@@ -42,12 +40,21 @@ const Cell = ({ row, col, cell, clickCell, flagCell }) => {
   const getCharacter = (cell) => {
     if (cell.open) {
       if (cell.val === -1) return <img src={digits['mine']} alt={'mine'} />;
+      if (cell.val === -2)
+        return (
+          <img src={digits['mine_death']} alt={'the mine that killed you'} />
+        );
+      if (cell.val === -3)
+        return <img src={digits['misflagged']} alt={'misflagged'} />;
       if (cell.val > 0) return <img src={digits[cell.val]} alt={cell.val} />;
       return '';
     } else if (cell.flagged) {
       if (cell.flagged === 1) return <img src={digits['flag']} alt={'flag'} />;
       if (cell.flagged === 2)
         return <img src={digits['?']} alt={'question mark'} />;
+    } else if (status === 'lost') {
+      if (cell.val === -1) return <img src={digits['mine']} alt={'mine'} />;
+      return '';
     }
     return '';
   };

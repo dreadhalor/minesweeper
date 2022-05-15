@@ -1,9 +1,11 @@
 import '../../Minesweeper.scss';
 import { smile, ohh, dead, win } from '../../../../assets/minesweeper/smile';
 
-const SmileButton = ({ reset }) => {
+const SmileButton = ({ reset, status, mousedown }) => {
   function getSmiley() {
-    // if (mousedown) return <img alt='ohh' src={ohh.defaul} />;
+    if (status === 'lost') return <img alt='dead' src={dead} />;
+    else if (status === 'won') return <img alt='win' src={win} />;
+    else if (mousedown) return <img alt='ohh' src={ohh} />;
     return <img alt='smile' src={smile} />;
   }
 

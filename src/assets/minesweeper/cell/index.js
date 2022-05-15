@@ -10,5 +10,4 @@ export { default as flag } from './flag.png';
 export { default as question } from './question.png';
 export { default as mine } from './mine.png';
 export { default as mine_death } from './mine-death.png';
-export { default as checked } from './checked.png';
 export { default as misflagged } from './misflagged.png';

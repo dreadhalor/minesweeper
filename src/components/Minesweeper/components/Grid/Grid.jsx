@@ -1,6 +1,6 @@
 import Cell from './Cell';
 
-const Grid = ({ grid, clickCell, flagCell }) => {
+const Grid = ({ grid, clickCell, flagCell, status }) => {
   return (
     <div
       className='minesweeper-border-colors-inset grid border-[3px]'
@@ -18,6 +18,7 @@ const Grid = ({ grid, clickCell, flagCell }) => {
               cell={cell}
               clickCell={clickCell}
               flagCell={flagCell}
+              status={status}
             />
           ))
         )}
