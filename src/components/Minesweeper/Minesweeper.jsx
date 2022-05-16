@@ -199,9 +199,9 @@ const Minesweeper = () => {
     if (grid === null) {
       setGrid(() => createEmptyGrid(16, 16));
     }
-    window.addEventListener('mouseup', mouseup);
+    window.addEventListener('pointerup', mouseup);
     return () => {
-      window.removeEventListener('mouseup', mouseup);
+      window.removeEventListener('pointerup', mouseup);
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -210,7 +210,7 @@ const Minesweeper = () => {
       {/* <div className='h-[20px]'></div> */}
       <div
         className='flex w-full flex-col gap-[5px] border-l-[3px] border-t-[3px] border-[rgb(245,245,245)] bg-[#c0c0c0] p-[5px]'
-        onMouseDown={(e) => {
+        onPointerDown={(e) => {
           e.preventDefault();
           setMousedown(true);
         }}

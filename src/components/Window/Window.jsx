@@ -53,7 +53,7 @@ const Window = ({
         ...getAppCoords(),
         zIndex: app.order,
       }}
-      onMouseDown={(e) => {
+      onPointerDown={(e) => {
         e.preventDefault();
         requestFocus(app.id);
       }}

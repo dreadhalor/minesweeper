@@ -3,7 +3,7 @@ const TaskbarWindow = ({ app, focusedApp, taskbarWindowClicked }) => {
 
   return (
     <div
-      onMouseDown={(e) => {
+      onPointerDown={(e) => {
         e.preventDefault();
         taskbarWindowClicked(app.id);
       }}

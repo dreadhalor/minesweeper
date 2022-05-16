@@ -4,9 +4,9 @@ const Icon = ({ src, name, coords, selection, onDoubleClick }) => {
   const [selected, setSelected] = useState(false);
 
   useEffect(() => {
-    document.addEventListener('mousedown', mousedown);
+    document.addEventListener('pointerdown', mousedown);
     return () => {
-      document.removeEventListener('mousedown', mousedown);
+      document.removeEventListener('pointerdown', mousedown);
     };
   }, []);
 
