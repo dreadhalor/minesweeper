@@ -40,8 +40,13 @@ function App() {
     setFocusedApp(id);
   };
   const closeApp = (id) => {
-    const newApps = apps.filter((app) => app.id !== id);
-    setApps(newApps);
+    let next_id = null;
+    setApps((prev_apps) => {
+      let remaining_apps = prev_apps.filter((app) => app.id !== id);
+      next_id = getHighestOrderOpenId(remaining_apps);
+      return remaining_apps;
+    });
+    requestFocus(next_id);
   };
   const minimizeApp = (id) => {
     let app = apps.find((app) => app.id === id);
@@ -59,27 +64,29 @@ function App() {
     else requestFocus(getHighestOrderOpenId());
   };
 
-  const getHighestOrderOpenId = () => {
-    let order = apps
+  const getHighestOrderOpenId = (candidate_apps) => {
+    if (!candidate_apps) candidate_apps = apps;
+    let order = candidate_apps
       .filter((app) => !app.minimized)
       .reduce((acc, app) => Math.max(acc, app.order), null);
-    return apps.find((app) => app.order === order)?.id ?? null;
+    return candidate_apps.find((app) => app.order === order)?.id ?? null;
   };
 
   const requestFocus = (id) => {
     setFocusedApp(id);
-    const nums = getUniqueNums(
-      apps.filter((app) => app.id !== id).map((app) => app.order)
-    );
-    const newApps = apps.map((app) => {
-      if (app.order in nums) {
-        app.order = nums[app.order];
-      } else {
-        app.order = Object.keys(nums).length;
-      }
-      return app;
+    setApps((prev_apps) => {
+      const nums = getUniqueNums(
+        apps.filter((app) => app.id !== id).map((app) => app.order)
+      );
+      return prev_apps.map((app) => {
+        if (app.order in nums) {
+          app.order = nums[app.order];
+        } else {
+          app.order = Object.keys(nums).length;
+        }
+        return app;
+      });
     });
-    setApps(newApps);
   };
 
   const getUniqueNums = (nums) => {
