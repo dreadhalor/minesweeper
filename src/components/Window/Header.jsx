@@ -1,7 +1,7 @@
 import './Window.scss';
 import './Header.scss';
 
-const Header = ({ bind, icon, title, focused, closeApp }) => {
+const Header = ({ bind, icon, title, focused, closeApp, minimizeApp }) => {
   const getBackground = () => {
     if (focused) return 'header-gradient-focused';
     return 'header-gradient-unfocused';
@@ -39,17 +39,30 @@ const Header = ({ bind, icon, title, focused, closeApp }) => {
           }}
         />
         <div
-          className='flex-1 text-[12px] font-semibold leading-[25px] tracking-[0.5px] text-white'
-          style={{ textShadow: 'rgb(0 0 0) 1px 1px' }}
+          className='flex-1 text-[13px] leading-[20px] tracking-[0.5px] text-white'
+          style={{
+            textShadow: 'rgb(0 0 0) 1px 1px',
+            fontFamily: 'Tahoma, "Noto Sans", sans-serif',
+            fontWeight: 500,
+          }}
         >
           {title}
         </div>
         <div className='flex flex-row' style={{ opacity: focused ? 1 : 0.6 }}>
-          <div className='header_button header__button--minimize'></div>
+          <div
+            className='header_button header__button--minimize'
+            onClick={(e) => {
+              e.preventDefault();
+              minimizeApp();
+            }}
+          ></div>
           <div className='header_button header__button--maximize header__button--disable'></div>
           <div
             className='header_button header__button--close'
-            onClick={closeApp}
+            onClick={(e) => {
+              e.preventDefault();
+              closeApp();
+            }}
           ></div>
         </div>
       </div>

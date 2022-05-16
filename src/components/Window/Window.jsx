@@ -1,29 +1,35 @@
 import { useDrag } from '@use-gesture/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import Header from './Header';
 import './Window.scss';
 
 const Window = ({
   children,
-  id,
-  icon,
-  title,
+  app,
   focusedApp,
   requestFocus,
   background_ref,
   closeApp,
+  setApps,
+  minimizeApp,
 }) => {
-  const [focused, setFocused] = useState(false);
-  const [window_coords, setWindowCoords] = useState([0, 0]);
-
   const window_ref = useRef(null);
+  useEffect(() => {
+    app.ref = window_ref;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const bind = useDrag(
     (e) => {
-      setWindowCoords([
-        window_coords[0] + e.delta[0],
-        window_coords[1] + e.delta[1],
-      ]);
+      if (focusedApp !== app.id) requestFocus(app.id);
+      setApps((prev_apps) => {
+        //why are we dividing this by 2? Fuck if I know
+        app.coords = [
+          app.coords[0] + e.delta[0] / 2,
+          app.coords[1] + e.delta[1] / 2,
+        ];
+        const new_apps = [...prev_apps];
+        return new_apps;
+      });
     },
     {
       bounds: background_ref,
@@ -33,30 +39,33 @@ const Window = ({
     }
   );
 
-  useEffect(() => {
-    if (focusedApp === id) {
-      setFocused(true);
-    } else {
-      setFocused(false);
-    }
-  }, [focusedApp, id]);
+  const focused = focusedApp === app.id;
+
+  const getAppCoords = () => {
+    const [left, top] = app.coords;
+    return { left, top };
+  };
 
   return (
     <div
       className='absolute flex flex-col'
       ref={window_ref}
       style={{
-        left: window_coords[0],
-        top: window_coords[1],
+        ...getAppCoords(),
+        zIndex: app.order,
       }}
-      onMouseDown={() => requestFocus(id)}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        requestFocus(app.id);
+      }}
     >
       <Header
         bind={bind}
-        icon={icon}
-        title={title}
+        icon={app.icon}
+        title={app.title}
         focused={focused}
-        closeApp={() => closeApp(id)}
+        closeApp={() => closeApp(app.id)}
+        minimizeApp={() => minimizeApp(app.id)}
       />
       <div
         className='border-x-[3px] border-b-[3px] bg-[#ece9d8]'

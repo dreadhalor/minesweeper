@@ -24,7 +24,10 @@ const Minesweeper = () => {
   const [seconds, setSeconds] = useState(0);
   const [status, setStatus] = useState('new');
   const [mousedown, setMousedown] = useState(false);
-  const mouseup = () => setMousedown(false);
+  const mouseup = (e) => {
+    e.preventDefault();
+    setMousedown(false);
+  };
 
   const reset = () => {
     setGrid(() => createEmptyGrid(16, 16));
@@ -207,7 +210,10 @@ const Minesweeper = () => {
       {/* <div className='h-[20px]'></div> */}
       <div
         className='flex w-full flex-col gap-[5px] border-l-[3px] border-t-[3px] border-[rgb(245,245,245)] bg-[#c0c0c0] p-[5px]'
-        onMouseDown={(e) => setMousedown(true)}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          setMousedown(true);
+        }}
       >
         <ScoreBar
           mines_remaining={getRemainingMines()}

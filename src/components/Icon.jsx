@@ -4,10 +4,8 @@ const Icon = ({ src, name, coords, selection, onDoubleClick }) => {
   const [selected, setSelected] = useState(false);
 
   useEffect(() => {
-    // document.addEventListener('click', click);
     document.addEventListener('mousedown', mousedown);
     return () => {
-      // document.removeEventListener('click', click);
       document.removeEventListener('mousedown', mousedown);
     };
   }, []);
@@ -34,11 +32,8 @@ const Icon = ({ src, name, coords, selection, onDoubleClick }) => {
     }
   }, [selection]);
 
-  // const click = (e) => {
-  //   const isClickedInside = e.target === icon_ref.current;
-  //   setSelected(isClickedInside);
-  // };
   const mousedown = (e) => {
+    e.preventDefault();
     const isClickedInside = e.target === icon_ref.current;
     setSelected(isClickedInside);
   };
@@ -65,6 +60,7 @@ const Icon = ({ src, name, coords, selection, onDoubleClick }) => {
       <div
         className='pointer-events-none text-[10px] text-white'
         style={{
+          fontFamily: 'Tahoma, "Noto Sans", sans-serif',
           textShadow: '0 1px 1px black',
           padding: '0 3px 2px',
           backgroundColor: selected ? '#0b61ff' : 'transparent',

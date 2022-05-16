@@ -1,14 +1,16 @@
-const TaskbarWindow = ({ id, icon, title, onMouseDown, focused }) => {
-  function _onMouseDown() {
-    onMouseDown(id);
-  }
+const TaskbarWindow = ({ app, focusedApp, taskbarWindowClicked }) => {
+  const focused = focusedApp === app.id;
+
   return (
     <div
-      onMouseDown={_onMouseDown}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        taskbarWindowClicked(app.id);
+      }}
       className={`footer__window ${focused ? 'focus' : 'cover'}`}
     >
-      <img className='footer__icon' src={icon} alt={title} />
-      <div className='footer__text'>{title}</div>
+      <img className='footer__icon' src={app.icon} alt={app.title} />
+      <div className='footer__text'>{app.title}</div>
     </div>
   );
 };

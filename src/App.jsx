@@ -1,4 +1,3 @@
-// import logo from './logo.svg';
 import bliss from './assets/bliss.jpeg';
 import minesweeper_icon from './assets/minesweeper/minesweeper-icon.png';
 import { useEffect, useRef, useState } from 'react';
@@ -11,37 +10,85 @@ import Taskbar from './components/Taskbar/Taskbar';
 import { v4 as uuidv4 } from 'uuid';
 
 function App() {
-  // const window_ref = useRef(null);
   const background_ref = useRef(null);
   const [selectionCoords, setSelectionCoords] = useState(null);
   const [selectionSize, setSelectionSize] = useState(null);
   const [focusedApp, setFocusedApp] = useState(null);
-  const [apps, setApps] = useState([{ id: uuidv4() }]);
-
-  const cols = 16,
-    cell_size = 16;
+  const [apps, setApps] = useState([
+    {
+      id: uuidv4(),
+      coords: [100, 100],
+      icon: minesweeper_icon,
+      title: 'Minesweeper',
+      order: 1,
+      minimized: false,
+    },
+  ]);
 
   const openApp = () => {
     const newApps = [...apps];
+    let id = uuidv4();
     newApps.push({
-      id: uuidv4(),
+      id,
       coords: [10, 10],
+      icon: minesweeper_icon,
+      title: 'Minesweeper',
+      order: newApps.reduce((acc, app) => Math.max(acc, app.order), 0) + 1,
+      minimized: false,
     });
     setApps(newApps);
+    setFocusedApp(id);
   };
   const closeApp = (id) => {
     const newApps = apps.filter((app) => app.id !== id);
     setApps(newApps);
   };
+  const minimizeApp = (id) => {
+    let app = apps.find((app) => app.id === id);
+    app.minimized = true;
+    setApps([...apps]);
+    requestFocus(getHighestOrderOpenId());
+  };
+
+  const taskbarWindowClicked = (id) => {
+    let app = apps.find((app) => app.id === id);
+    if (app.minimized) app.minimized = false;
+    else if (focusedApp === id) app.minimized = true;
+    setApps([...apps]);
+    if (!app.minimized) requestFocus(id);
+    else requestFocus(getHighestOrderOpenId());
+  };
+
+  const getHighestOrderOpenId = () => {
+    let order = apps
+      .filter((app) => !app.minimized)
+      .reduce((acc, app) => Math.max(acc, app.order), null);
+    return apps.find((app) => app.order === order)?.id ?? null;
+  };
 
   const requestFocus = (id) => {
     setFocusedApp(id);
-    const sorted = [...apps].sort((a, b) => {
-      if (a.id === id) return 1;
-      if (b.id === id) return -1;
-      return 0;
+    const nums = getUniqueNums(
+      apps.filter((app) => app.id !== id).map((app) => app.order)
+    );
+    const newApps = apps.map((app) => {
+      if (app.order in nums) {
+        app.order = nums[app.order];
+      } else {
+        app.order = Object.keys(nums).length;
+      }
+      return app;
     });
-    setApps(sorted);
+    setApps(newApps);
+  };
+
+  const getUniqueNums = (nums) => {
+    if (nums.length === 0) return {};
+    let ids = {};
+    for (let i = 0; i < nums.length; i++) {
+      ids[nums[i]] = i;
+    }
+    return ids;
   };
 
   const bind = useDrag(
@@ -74,20 +121,24 @@ function App() {
   );
 
   useEffect(() => {
-    // setWindowCoords([
-    //   Math.max(
-    //     (background_ref.current.offsetWidth -
-    //       (window_ref.current.offsetWidth + cols * cell_size)) /
-    //       2,
-    //     0
-    //   ),
-    //   Math.max(
-    //     (background_ref.current.offsetHeight -
-    //       (window_ref.current.offsetHeight + cols * cell_size)) /
-    //       2,
-    //     0
-    //   ),
-    // ]);
+    setApps((prev_apps) => {
+      const new_apps = [...prev_apps];
+      const app = new_apps[0];
+      app.coords = [
+        Math.max(
+          (background_ref.current.offsetWidth - app.ref.current.offsetWidth) /
+            2,
+          0
+        ),
+        Math.max(
+          (background_ref.current.offsetHeight - app.ref.current.offsetHeight) /
+            2,
+          0
+        ),
+      ];
+      return new_apps;
+    });
+    requestFocus(getHighestOrderOpenId());
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -95,7 +146,7 @@ function App() {
       <div
         {...bind()}
         ref={background_ref}
-        className='relative w-full flex-1'
+        className='relative w-full flex-1 overflow-hidden'
         style={{
           backgroundImage: `url(${bliss})`,
           backgroundSize: 'cover',
@@ -119,22 +170,28 @@ function App() {
             height: selectionSize ? `${selectionSize[1]}px` : 0,
           }}
         ></div>
-        {apps.map((app) => (
-          <Window
-            key={app.id}
-            id={app.id}
-            icon={minesweeper_icon}
-            title={'Minesweeper'}
-            focusedApp={focusedApp}
-            requestFocus={requestFocus}
-            background_ref={background_ref}
-            closeApp={closeApp}
-          >
-            <Minesweeper />
-          </Window>
-        ))}
+        {apps
+          .filter((app) => !app.minimized)
+          .map((app) => (
+            <Window
+              key={app.id}
+              app={app}
+              focusedApp={focusedApp}
+              requestFocus={requestFocus}
+              background_ref={background_ref}
+              closeApp={closeApp}
+              setApps={setApps}
+              minimizeApp={minimizeApp}
+            >
+              <Minesweeper />
+            </Window>
+          ))}
       </div>
-      <Taskbar />
+      <Taskbar
+        apps={apps}
+        focusedApp={focusedApp}
+        taskbarWindowClicked={taskbarWindowClicked}
+      />
     </div>
   );
 }

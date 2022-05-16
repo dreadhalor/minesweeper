@@ -12,7 +12,10 @@ const SmileButton = ({ reset, status, mousedown }) => {
   return (
     <div
       className='mine__face__outer h-[24px] w-[24px] rounded-[2px] border-l border-t border-[rgb(128,128,128)]'
-      onClick={reset}
+      onClick={(e) => {
+        e.preventDefault();
+        reset();
+      }}
     >
       <div className='mine__face flex h-full w-full items-center justify-center rounded-[2px] border-2 border-solid bg-[rgb(192,192,192)] outline-none'>
         {getSmiley()}

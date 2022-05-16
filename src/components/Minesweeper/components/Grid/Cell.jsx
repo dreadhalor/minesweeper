@@ -13,6 +13,7 @@ import {
   mine_death,
   misflagged,
 } from '../../../../assets/minesweeper/cell';
+import './Cell.scss';
 
 const Cell = ({ row, col, cell, clickCell, flagCell, status }) => {
   const cell_size = 16;
@@ -35,6 +36,8 @@ const Cell = ({ row, col, cell, clickCell, flagCell, status }) => {
 
   const getBorder = (cell) => {
     if (cell.open === 1) return 'open-square-border';
+    if (cell.flagged || status === 'lost' || status === 'win')
+      return 'closed-square-border-no-hover';
     return 'closed-square-border';
   };
   const getCharacter = (cell) => {
@@ -66,7 +69,8 @@ const Cell = ({ row, col, cell, clickCell, flagCell, status }) => {
         height: `${cell_size}px`,
         width: `${cell_size}px`,
       }}
-      onClick={() => {
+      onClick={(e) => {
+        e.preventDefault();
         clickCell(row, col);
       }}
       onContextMenu={(e) => {
@@ -74,8 +78,8 @@ const Cell = ({ row, col, cell, clickCell, flagCell, status }) => {
         flagCell(row, col);
       }}
     >
-      <div className={`absolute inset-0 ${getBorder(cell)}`}></div>
       <div className='absolute inset-0'>{getCharacter(cell)}</div>
+      <div className={`absolute inset-0 ${getBorder(cell)}`}></div>
     </div>
   );
 };

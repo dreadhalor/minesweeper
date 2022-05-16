@@ -16,16 +16,6 @@ const ScoreBar = ({
         <SmileButton reset={reset} status={status} mousedown={mousedown} />
         <DigitDisplay num={seconds_elapsed ?? 0} />
       </div>
-      {/* <div className='mine__score-bar'>
-        <div className='mine__digits__outer'>{renderDigits(remainMines())}</div>
-        <div className='mine__face__outer'>
-          <button ref={face} className='mine__face' onClick={() => onReset()}>
-            {statusFace()}
-            <img alt='smile' src={smile} />
-          </button>
-        </div>
-        <div className='mine__digits__outer'>{renderDigits(seconds)}</div>
-      </div> */}
     </>
   );
 };
