@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-const Icon = ({ src, name, coords, selection }) => {
+const Icon = ({ src, name, coords, selection, onDoubleClick }) => {
   const [selected, setSelected] = useState(false);
 
   useEffect(() => {
@@ -50,6 +50,7 @@ const Icon = ({ src, name, coords, selection }) => {
       className='absolute flex flex-col gap-[5px]'
       style={{ left: `${coords[0]}px`, top: `${coords[1]}px` }}
       ref={icon_ref}
+      onDoubleClick={onDoubleClick}
     >
       <div
         className='pointer-events-none m-auto h-[30px] w-[30px]'

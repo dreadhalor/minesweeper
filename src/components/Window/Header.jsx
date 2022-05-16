@@ -1,13 +1,30 @@
 import './Window.scss';
+import './Header.scss';
 
-const Header = ({ bind, icon, title }) => {
+const Header = ({ bind, icon, title, focused, closeApp }) => {
+  const getBackground = () => {
+    if (focused) return 'header-gradient-focused';
+    return 'header-gradient-unfocused';
+  };
+
   return (
     <div
       {...bind()}
       className='relative h-[28px] w-full flex-row overflow-hidden rounded-t-[8px]'
       style={{ touchAction: 'none' }}
     >
-      <div className='header header-gradient-focused absolute left-0 top-0 right-0 bottom-0'></div>
+      <div
+        className={`${getBackground()} absolute left-0 top-0 right-0 bottom-0`}
+      ></div>
+      <div
+        className='header-gradient-left absolute left-0 top-0 bottom-0 w-[15px]'
+        style={{ opacity: focused ? 1 : 0.4 }}
+      ></div>
+      <div
+        className='header-gradient-right absolute right-0 top-0 bottom-0 w-[15px]'
+        style={{ opacity: focused ? 1 : 0.4 }}
+      ></div>
+
       <div className='header-buttons-container absolute left-0 right-0 bottom-0 flex h-[25px] flex-row items-center px-[3px] pb-[1px]'>
         <img
           src={icon}
@@ -27,9 +44,14 @@ const Header = ({ bind, icon, title }) => {
         >
           {title}
         </div>
-        <div className='header_button header__button--minimize'></div>
-        <div className='header_button header__button--maximize'></div>
-        <div className='header_button header__button--close'></div>
+        <div className='flex flex-row' style={{ opacity: focused ? 1 : 0.6 }}>
+          <div className='header_button header__button--minimize'></div>
+          <div className='header_button header__button--maximize header__button--disable'></div>
+          <div
+            className='header_button header__button--close'
+            onClick={closeApp}
+          ></div>
+        </div>
       </div>
     </div>
   );

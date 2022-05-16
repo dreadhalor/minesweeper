@@ -1,15 +1,30 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Grid from './components/Grid/Grid';
 import ScoreBar from './components/ScoreBar/ScoreBar';
 import './Minesweeper.scss';
 
 const Minesweeper = () => {
-  const [grid, setGrid] = useState(null);
+  const createEmptyGrid = (rows, cols) => {
+    const result = [];
+    for (let i = 0; i < rows; i++) {
+      let row = [];
+      for (let j = 0; j < cols; j++) {
+        row.push({
+          val: -2,
+          open: 0,
+          flagged: 0,
+        });
+      }
+      result.push(row);
+    }
+    return result;
+  };
+
+  const [grid, setGrid] = useState(createEmptyGrid(16, 16));
   const [seconds, setSeconds] = useState(0);
   const [status, setStatus] = useState('new');
   const [mousedown, setMousedown] = useState(false);
   const mouseup = () => setMousedown(false);
-  const play_area_ref = useRef(null);
 
   const reset = () => {
     setGrid(() => createEmptyGrid(16, 16));
@@ -44,7 +59,7 @@ const Minesweeper = () => {
 
   const rows = 16,
     cols = 16,
-    bombs = 2;
+    bombs = 40;
 
   const clickCell = (row, col) => {
     if (isPlaying()) {
@@ -110,21 +125,6 @@ const Minesweeper = () => {
     }
   };
 
-  const createEmptyGrid = (rows, cols) => {
-    const result = [];
-    for (let i = 0; i < rows; i++) {
-      let row = [];
-      for (let j = 0; j < cols; j++) {
-        row.push({
-          val: -2,
-          open: 0,
-          flagged: 0,
-        });
-      }
-      result.push(row);
-    }
-    return result;
-  };
   const formatGrid = (starting_row, starting_column) => {
     const result = [...grid];
     setBombs(result, bombs, starting_row * cols + starting_column);
@@ -208,7 +208,6 @@ const Minesweeper = () => {
       <div
         className='flex w-full flex-col gap-[5px] border-l-[3px] border-t-[3px] border-[rgb(245,245,245)] bg-[#c0c0c0] p-[5px]'
         onMouseDown={(e) => setMousedown(true)}
-        ref={play_area_ref}
       >
         <ScoreBar
           mines_remaining={getRemainingMines()}
