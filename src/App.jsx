@@ -178,7 +178,7 @@ function App() {
           }}
         ></div>
         {apps
-          .filter((app) => !app.minimized)
+          // .filter((app) => !app.minimized)
           .map((app) => (
             <Window
               key={app.id}

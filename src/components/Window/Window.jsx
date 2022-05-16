@@ -47,11 +47,12 @@ const Window = ({
 
   return (
     <div
-      className='absolute flex flex-col'
+      className='absolute flex-col'
       ref={window_ref}
       style={{
         ...getAppCoords(),
         zIndex: app.order,
+        display: app.minimized ? 'none' : 'flex',
       }}
       onPointerDown={(e) => {
         e.preventDefault();
