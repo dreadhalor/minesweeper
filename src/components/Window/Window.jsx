@@ -23,10 +23,9 @@ const Window = ({
       if (focusedApp !== app.id) requestFocus(app.id);
       setApps((prev_apps) => {
         //why are we dividing this by 2? Fuck if I know
-        app.coords = [
-          app.coords[0] + e.delta[0] / 2,
-          app.coords[1] + e.delta[1] / 2,
-        ];
+        //TURNS OUT IT DOESN'T HAPPEN IN PROD
+        //SO FUCK IT WE AREN'T GONNA DIVIDE SHIT
+        app.coords = [app.coords[0] + e.delta[0], app.coords[1] + e.delta[1]];
         const new_apps = [...prev_apps];
         return new_apps;
       });
