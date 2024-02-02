@@ -1,1 +1,3 @@
 - minesweeper cells should respond to mousedown (implemented this via javascript but the slowdown wasn't worth it)
+
+* Make a leaderboard
