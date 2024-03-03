@@ -1,4 +1,3 @@
-import bliss from './assets/bliss.jpeg';
 import minesweeper_icon from './assets/minesweeper/minesweeper-icon.png';
 import { useEffect, useRef, useState } from 'react';
 import './App.scss';
@@ -169,7 +168,7 @@ function App() {
         ref={background_ref}
         className='relative w-full flex-1 overflow-hidden'
         style={{
-          backgroundImage: `url(${bliss})`,
+          backgroundImage: `url(https://i.imgur.com/Zk6TR5k.jpg)`,
           backgroundSize: 'cover',
           touchAction: 'none',
         }}
