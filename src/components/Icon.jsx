@@ -1,3 +1,4 @@
+import { useAchievements } from 'dread-ui';
 import { useEffect, useRef, useState } from 'react';
 
 const Icon = ({ src, name, coords, selection, onDoubleClick }) => {
@@ -9,6 +10,8 @@ const Icon = ({ src, name, coords, selection, onDoubleClick }) => {
       document.removeEventListener('pointerdown', mousedown);
     };
   }, []);
+
+  const { unlockAchievementById } = useAchievements();
 
   useEffect(() => {
     //if the selection overlaps the boundingClientRect of icon_ref, select it
@@ -28,6 +31,7 @@ const Icon = ({ src, name, coords, selection, onDoubleClick }) => {
         selection_rect.right >= icon_rect.left
       ) {
         setSelected(true);
+        unlockAchievementById('marquee_selection', 'minesweeper');
       } else setSelected(false);
     }
   }, [selection]);
@@ -45,6 +49,7 @@ const Icon = ({ src, name, coords, selection, onDoubleClick }) => {
       className='absolute flex flex-col gap-[5px]'
       style={{ left: `${coords[0]}px`, top: `${coords[1]}px` }}
       ref={icon_ref}
+      onClick={() => unlockAchievementById('click_icon', 'minesweeper')}
       onDoubleClick={onDoubleClick}
     >
       <div

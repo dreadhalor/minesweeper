@@ -2,8 +2,16 @@ import { useState, useEffect } from 'react';
 import Grid from './components/Grid/Grid';
 import ScoreBar from './components/ScoreBar/ScoreBar';
 import './Minesweeper.scss';
+import { GameMenu } from './game-menu';
+import { useAchievements } from 'dread-ui';
 
-const Minesweeper = () => {
+export const difficultySettings = {
+  beginner: { rows: 9, cols: 9, bombs: 10 },
+  intermediate: { rows: 16, cols: 16, bombs: 40 },
+  expert: { rows: 16, cols: 30, bombs: 99 },
+};
+
+const Minesweeper = ({ closeApp }) => {
   const createEmptyGrid = (rows, cols) => {
     const result = [];
     for (let i = 0; i < rows; i++) {
@@ -20,7 +28,12 @@ const Minesweeper = () => {
     return result;
   };
 
-  const [grid, setGrid] = useState(createEmptyGrid(16, 16));
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [guessCount, setGuessCount] = useState(0);
+  const [rows, setRows] = useState(difficultySettings.beginner.rows);
+  const [cols, setCols] = useState(difficultySettings.beginner.cols);
+  const [bombs, setBombs] = useState(difficultySettings.beginner.bombs);
+  const [grid, setGrid] = useState(createEmptyGrid(rows, cols));
   const [seconds, setSeconds] = useState(0);
   const [status, setStatus] = useState('new');
   const [mousedown, setMousedown] = useState(false);
@@ -29,8 +42,37 @@ const Minesweeper = () => {
     setMousedown(false);
   };
 
-  const reset = () => {
-    setGrid(() => createEmptyGrid(16, 16));
+  const { unlockAchievementById } = useAchievements();
+
+  useEffect(() => {
+    if (status === 'lost') {
+      unlockAchievementById('lose_game', 'minesweeper');
+      if (guessCount === 2)
+        unlockAchievementById('lose_second_click', 'minesweeper');
+    }
+    if (status === 'won') {
+      const { beginner, intermediate, expert } = difficultySettings;
+      if (rows === beginner.rows && cols === beginner.cols)
+        unlockAchievementById('beat_beginner', 'minesweeper');
+      if (rows === intermediate.rows && cols === intermediate.cols)
+        unlockAchievementById('beat_intermediate', 'minesweeper');
+      if (rows === expert.rows && cols === expert.cols)
+        unlockAchievementById('beat_expert', 'minesweeper');
+    }
+    if (status === 'new') {
+      setGuessCount(0);
+    }
+  }, [status, rows, cols, unlockAchievementById, guessCount]);
+
+  const reset = (difficulty) => {
+    if (difficulty) {
+      const settings = difficultySettings[difficulty];
+      setRows(() => settings.rows);
+      setCols(() => settings.cols);
+      setBombs(() => settings.bombs);
+      setGrid(createEmptyGrid(settings.rows, settings.cols));
+    } else setGrid(createEmptyGrid(rows, cols));
+    setMenuOpen(false);
     setStatus('new');
   };
   const isPlaying = () => status === 'new' || status === 'started';
@@ -60,12 +102,9 @@ const Minesweeper = () => {
     return () => clearInterval(timer);
   }, [status]);
 
-  const rows = 16,
-    cols = 16,
-    bombs = 40;
-
   const clickCell = (row, col) => {
     if (isPlaying()) {
+      setGuessCount((count) => count + 1);
       if (grid[row][col].val === -2) formatGrid(row, col);
       if (!(grid[row][col].open || grid[row][col].flagged)) {
         const newGrid = [...grid];
@@ -98,7 +137,7 @@ const Minesweeper = () => {
                 ([r, c]) =>
                   candidate_grid[r][c].val !== -1 &&
                   candidate_grid[r][c].open === 0 &&
-                  candidate_grid[r][c].flagged === 0
+                  candidate_grid[r][c].flagged === 0,
               );
               stack = stack.concat(unflagged_zeroes);
             }
@@ -123,14 +162,21 @@ const Minesweeper = () => {
   const flagCell = (row, col) => {
     if (isPlaying()) {
       const newGrid = [...grid];
-      newGrid[row][col].flagged = (newGrid[row][col].flagged + 1) % 3;
-      setGrid(newGrid);
+      const cell = newGrid[row][col];
+      if (cell.open === 0) {
+        cell.flagged = (cell.flagged + 1) % 3;
+        if (cell.flagged === 1)
+          unlockAchievementById('flag_cell', 'minesweeper');
+        if (cell.flagged === 2)
+          unlockAchievementById('question_cell', 'minesweeper');
+        setGrid(newGrid);
+      }
     }
   };
 
   const formatGrid = (starting_row, starting_column) => {
     const result = [...grid];
-    setBombs(result, bombs, starting_row * cols + starting_column);
+    plantBombs(result, bombs, starting_row * cols + starting_column);
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         if (result[i][j].val !== -1)
@@ -140,7 +186,7 @@ const Minesweeper = () => {
     setGrid(result);
   };
 
-  const setBombs = (candidate_grid, bombs, starting_index = null) => {
+  const plantBombs = (candidate_grid, bombs, starting_index = null) => {
     let rows = candidate_grid.length;
     let cols = candidate_grid[0].length;
     let total_cells = rows * cols;
@@ -186,7 +232,7 @@ const Minesweeper = () => {
   const getMineCount = (candidate_grid, row, col) => {
     let neighbor_coords = getNeighbors(candidate_grid, row, col);
     let neighbor_cells = neighbor_coords.map(
-      ([row, col]) => candidate_grid[row][col]
+      ([row, col]) => candidate_grid[row][col],
     );
     let mine_count = neighbor_cells.filter((cell) => cell.val === -1).length;
     return mine_count;
@@ -197,7 +243,12 @@ const Minesweeper = () => {
 
   useEffect(() => {
     if (grid === null) {
-      setGrid(() => createEmptyGrid(16, 16));
+      setGrid(() =>
+        createEmptyGrid(
+          difficultySettings.beginner.rows,
+          difficultySettings.beginner.cols,
+        ),
+      );
     }
     window.addEventListener('pointerup', mouseup);
     return () => {
@@ -207,7 +258,13 @@ const Minesweeper = () => {
 
   return (
     <div className='flex h-full w-full flex-col'>
-      {/* <div className='h-[20px]'></div> */}
+      <GameMenu
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+        reset={reset}
+        grid={grid}
+        closeApp={closeApp}
+      />
       <div
         className='flex w-full flex-col gap-[5px] border-l-[3px] border-t-[3px] border-[rgb(245,245,245)] bg-[#c0c0c0] p-[5px]'
         onPointerDown={(e) => {

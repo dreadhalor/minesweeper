@@ -1,5 +1,6 @@
 import '../../Minesweeper.scss';
 import { smile, ohh, dead, win } from '../../../../assets/minesweeper/smile';
+import { useAchievements } from 'dread-ui';
 
 const SmileButton = ({ reset, status, mousedown }) => {
   function getSmiley() {
@@ -9,11 +10,14 @@ const SmileButton = ({ reset, status, mousedown }) => {
     return <img alt='smile' src={smile} />;
   }
 
+  const { unlockAchievementById } = useAchievements();
+
   return (
     <div
       className='mine__face__outer h-[24px] w-[24px] rounded-[2px] border-l border-t border-[rgb(128,128,128)]'
       onClick={(e) => {
         e.preventDefault();
+        unlockAchievementById('click_smiley', 'minesweeper');
         reset();
       }}
     >

@@ -8,8 +8,10 @@ import Window from './components/Window/Window';
 import Minesweeper from './components/Minesweeper/Minesweeper';
 import Taskbar from './components/Taskbar/Taskbar';
 import { v4 as uuidv4 } from 'uuid';
+import { UserMenu, Card, CardContent, useAchievements } from 'dread-ui';
 
 function App() {
+  const { unlockAchievementById } = useAchievements();
   const background_ref = useRef(null);
   const [selectionCoords, setSelectionCoords] = useState(null);
   const [selectionSize, setSelectionSize] = useState(null);
@@ -36,13 +38,21 @@ function App() {
       order: newApps.reduce((acc, app) => Math.max(acc, app.order), 0) + 1,
       minimized: false,
     });
+    unlockAchievementById('open_window', 'minesweeper');
+    if (newApps.length >= 2)
+      unlockAchievementById('two_windows', 'minesweeper');
+    if (newApps.length >= 5)
+      unlockAchievementById('five_windows', 'minesweeper');
     setApps(newApps);
     setFocusedApp(id);
   };
   const closeApp = (id) => {
     let next_id = null;
     setApps((prev_apps) => {
+      const current_apps_length = prev_apps.length;
       let remaining_apps = prev_apps.filter((app) => app.id !== id);
+      if (current_apps_length > remaining_apps.length)
+        unlockAchievementById('close_window', 'minesweeper');
       next_id = getHighestOrderOpenId(remaining_apps);
       return remaining_apps;
     });
@@ -50,6 +60,7 @@ function App() {
   };
   const minimizeApp = (id) => {
     let app = apps.find((app) => app.id === id);
+    if (!app.minimized) unlockAchievementById('minimize_window', 'minesweeper');
     app.minimized = true;
     setApps([...apps]);
     requestFocus(getHighestOrderOpenId());
@@ -58,7 +69,10 @@ function App() {
   const taskbarWindowClicked = (id) => {
     let app = apps.find((app) => app.id === id);
     if (app.minimized) app.minimized = false;
-    else if (focusedApp === id) app.minimized = true;
+    else if (focusedApp === id) {
+      app.minimized = true;
+      unlockAchievementById('minimize_window', 'minesweeper');
+    }
     setApps([...apps]);
     if (!app.minimized) requestFocus(id);
     else requestFocus(getHighestOrderOpenId());
@@ -76,7 +90,7 @@ function App() {
     setFocusedApp(id);
     setApps((prev_apps) => {
       const nums = getUniqueNums(
-        apps.filter((app) => app.id !== id).map((app) => app.order)
+        apps.filter((app) => app.id !== id).map((app) => app.order),
       );
       return prev_apps.map((app) => {
         if (app.order in nums) {
@@ -124,7 +138,7 @@ function App() {
         setSelectionCoords(null);
       }
     },
-    { bounds: background_ref, pointer: { capture: false } }
+    { bounds: background_ref, pointer: { capture: false } },
   );
 
   useEffect(() => {
@@ -135,12 +149,12 @@ function App() {
         Math.max(
           (background_ref.current.offsetWidth - app.ref.current.offsetWidth) /
             2,
-          0
+          0,
         ),
         Math.max(
           (background_ref.current.offsetHeight - app.ref.current.offsetHeight) /
             2,
-          0
+          0,
         ),
       ];
       return new_apps;
@@ -177,22 +191,25 @@ function App() {
             height: selectionSize ? `${selectionSize[1]}px` : 0,
           }}
         ></div>
-        {apps
-          // .filter((app) => !app.minimized)
-          .map((app) => (
-            <Window
-              key={app.id}
-              app={app}
-              focusedApp={focusedApp}
-              requestFocus={requestFocus}
-              background_ref={background_ref}
-              closeApp={closeApp}
-              setApps={setApps}
-              minimizeApp={minimizeApp}
-            >
-              <Minesweeper />
-            </Window>
-          ))}
+        {apps.map((app) => (
+          <Window
+            key={app.id}
+            app={app}
+            focusedApp={focusedApp}
+            requestFocus={requestFocus}
+            background_ref={background_ref}
+            closeApp={closeApp}
+            setApps={setApps}
+            minimizeApp={minimizeApp}
+          >
+            <Minesweeper closeApp={() => closeApp(app.id)} />
+          </Window>
+        ))}
+        <Card className='absolute right-[40px] top-[40px] rounded-full'>
+          <CardContent noHeader className='p-0'>
+            <UserMenu />
+          </CardContent>
+        </Card>
       </div>
       <Taskbar
         apps={apps}
