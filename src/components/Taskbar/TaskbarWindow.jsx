@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 const TaskbarWindow = ({ app, focusedApp, taskbarWindowClicked }) => {
   const focused = focusedApp === app.id;
 

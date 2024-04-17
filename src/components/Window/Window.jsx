@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useDrag } from '@use-gesture/react';
 import { useEffect, useRef } from 'react';
 import Header from './Header';

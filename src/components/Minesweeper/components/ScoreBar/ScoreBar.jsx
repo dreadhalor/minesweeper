@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import '../../Minesweeper.scss';
 import DigitDisplay from './DigitDisplay';
 import SmileButton from './SmileButton';

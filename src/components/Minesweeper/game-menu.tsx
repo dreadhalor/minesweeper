@@ -1,6 +1,6 @@
 import { cn } from '@repo/utils';
 import Checkmark from '../../assets/minesweeper/icons/checked.png';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 type Cell = {
   val: number;

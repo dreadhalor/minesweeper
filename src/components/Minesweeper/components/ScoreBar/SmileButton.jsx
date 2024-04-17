@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import '../../Minesweeper.scss';
 import { smile, ohh, dead, win } from '../../../../assets/minesweeper/smile';
 import { useAchievements } from 'dread-ui';

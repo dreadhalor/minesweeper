@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import './Window.scss';
 import './Header.scss';
 

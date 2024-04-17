@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useAchievements } from 'dread-ui';
 import { useEffect, useRef, useState } from 'react';
 
@@ -34,7 +35,7 @@ const Icon = ({ src, name, coords, selection, onDoubleClick }) => {
         unlockAchievementById('marquee_selection', 'minesweeper');
       } else setSelected(false);
     }
-  }, [selection]);
+  }, [selection, unlockAchievementById]);
 
   const mousedown = (e) => {
     e.preventDefault();

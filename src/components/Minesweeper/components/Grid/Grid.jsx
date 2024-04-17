@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import Cell from './Cell';
 
 const Grid = ({ grid, clickCell, flagCell, status }) => {
@@ -20,7 +21,7 @@ const Grid = ({ grid, clickCell, flagCell, status }) => {
               flagCell={flagCell}
               status={status}
             />
-          ))
+          )),
         )}
     </div>
   );

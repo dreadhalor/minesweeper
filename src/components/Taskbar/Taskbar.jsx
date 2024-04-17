@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import './Taskbar.scss';
 import TaskbarTime from './TaskbarTime';
 import TaskbarWindow from './TaskbarWindow';

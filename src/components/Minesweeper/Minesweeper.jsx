@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect } from 'react';
 import Grid from './components/Grid/Grid';
 import ScoreBar from './components/ScoreBar/ScoreBar';
@@ -5,6 +6,7 @@ import './Minesweeper.scss';
 import { GameMenu } from './game-menu';
 import { useAchievements } from 'dread-ui';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const difficultySettings = {
   beginner: { rows: 9, cols: 9, bombs: 10 },
   intermediate: { rows: 16, cols: 16, bombs: 40 },
