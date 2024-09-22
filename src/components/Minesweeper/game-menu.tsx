@@ -1,12 +1,12 @@
+import React, { useEffect, useRef } from 'react';
 import { cn } from '@repo/utils';
 import Checkmark from '../../assets/minesweeper/icons/checked.png';
-import React, { useEffect, useRef } from 'react';
+import {
+  useMinesweeper,
+  CellType,
+  difficultySettings,
+} from '../../providers/minesweeper-provider';
 
-type Cell = {
-  val: number;
-  open: number;
-  flagged: number;
-};
 type GameMenuItemDropdownItemProps = {
   children: React.ReactNode;
   showCheckmark?: boolean;
@@ -30,7 +30,7 @@ const GameMenuItemDropdownItem = ({
           <img
             src={Checkmark}
             alt='checked'
-            className='w-[7px]h-[7px] group-hover:invert'
+            className='h-[7px] w-[7px] group-hover:invert'
           />
         )}
       </span>
@@ -64,12 +64,11 @@ const GameMenuItemDropdown = ({
 };
 
 type GameMenuItemProps = {
-  grid: Cell[][];
+  grid: CellType[][];
   menuOpen: boolean;
   setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  reset: (difficulty?: string) => void;
+  reset: (difficulty?: keyof typeof difficultySettings) => void;
   children: React.ReactNode;
-  closeApp: () => void;
 };
 const GameMenuItem = ({
   grid,
@@ -77,12 +76,13 @@ const GameMenuItem = ({
   setMenuOpen,
   reset,
   children,
-  closeApp,
 }: GameMenuItemProps) => {
   const menuItemRef = useRef<HTMLDivElement>(null);
-  const cols = grid?.[0]?.length;
+  const cols = grid[0]?.length;
   const difficulty =
     cols === 9 ? 'beginner' : cols === 16 ? 'intermediate' : 'expert';
+
+  const { closeApp } = useMinesweeper();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -97,7 +97,7 @@ const GameMenuItem = ({
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [menuItemRef]);
+  }, [menuItemRef, setMenuOpen]);
 
   return (
     <div
@@ -147,19 +147,12 @@ const GameMenuItem = ({
 };
 
 type GameMenuProps = {
-  grid: Cell[][];
+  grid: CellType[][];
   menuOpen: boolean;
   setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  reset: (difficulty?: string) => void;
-  closeApp: () => void;
+  reset: (difficulty?: keyof typeof difficultySettings) => void;
 };
-const GameMenu = ({
-  menuOpen,
-  setMenuOpen,
-  reset,
-  grid,
-  closeApp,
-}: GameMenuProps) => {
+const GameMenu = ({ menuOpen, setMenuOpen, reset, grid }: GameMenuProps) => {
   return (
     <div className='relative flex h-[20px] items-center bg-[rgb(236,233,216)]'>
       <GameMenuItem
@@ -167,7 +160,6 @@ const GameMenu = ({
         setMenuOpen={setMenuOpen}
         reset={reset}
         grid={grid}
-        closeApp={closeApp}
       >
         Game
       </GameMenuItem>

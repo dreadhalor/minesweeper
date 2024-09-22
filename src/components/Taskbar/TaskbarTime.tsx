@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Taskbar.scss';
 
-const TaskbarTime = () => {
+const TaskbarTime: React.FC = () => {
   const getTime = () => {
     const date = new Date();
     let hour = date.getHours();
     let hourPostFix = 'AM';
-    let min = date.getMinutes();
+    let min: string | number = date.getMinutes();
     if (hour >= 12) {
       hour -= 12;
       hourPostFix = 'PM';
@@ -20,7 +20,7 @@ const TaskbarTime = () => {
     return `${hour}:${min} ${hourPostFix}`;
   };
 
-  const [time, setTime] = useState(getTime);
+  const [time, setTime] = useState<string>(getTime);
 
   useEffect(() => {
     const timer = setInterval(() => {

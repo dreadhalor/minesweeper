@@ -1,23 +1,37 @@
-/* eslint-disable react/prop-types */
+import React, { useEffect, useRef, useState } from 'react';
 import { useAchievements } from 'dread-ui';
-import { useEffect, useRef, useState } from 'react';
 
-const Icon = ({ src, name, coords, selection, onDoubleClick }) => {
-  const [selected, setSelected] = useState(false);
+interface IconProps {
+  src: string;
+  name: string;
+  coords: [number, number];
+  selection: [[number, number] | null, [number, number] | null];
+  onDoubleClick: () => void;
+}
+
+const Icon: React.FC<IconProps> = ({
+  src,
+  name,
+  coords,
+  selection,
+  onDoubleClick,
+}) => {
+  const [selected, setSelected] = useState<boolean>(false);
+  const icon_ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.addEventListener('pointerdown', mousedown);
     return () => {
       document.removeEventListener('pointerdown', mousedown);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { unlockAchievementById } = useAchievements();
 
   useEffect(() => {
-    //if the selection overlaps the boundingClientRect of icon_ref, select it
-    if (selection[0] && selection[1]) {
-      let [[x, y], [w, h]] = selection;
+    if (selection[0] && selection[1] && icon_ref.current) {
+      const [[x, y], [w, h]] = selection;
       const icon_rect = icon_ref.current.getBoundingClientRect();
       const selection_rect = {
         top: y,
@@ -35,15 +49,14 @@ const Icon = ({ src, name, coords, selection, onDoubleClick }) => {
         unlockAchievementById('marquee_selection', 'minesweeper');
       } else setSelected(false);
     }
-  }, [selection, unlockAchievementById]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selection]);
 
-  const mousedown = (e) => {
+  const mousedown = (e: PointerEvent) => {
     e.preventDefault();
     const isClickedInside = e.target === icon_ref.current;
     setSelected(isClickedInside);
   };
-
-  const icon_ref = useRef(null);
 
   return (
     <div

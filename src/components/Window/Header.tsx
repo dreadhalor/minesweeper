@@ -1,8 +1,24 @@
-/* eslint-disable react/prop-types */
+import React from 'react';
 import './Window.scss';
 import './Header.scss';
 
-const Header = ({ bind, icon, title, focused, closeApp, minimizeApp }) => {
+interface HeaderProps {
+  bind: () => React.DOMAttributes<Element>;
+  icon: string;
+  title: string;
+  focused: boolean;
+  closeApp: () => void;
+  minimizeApp: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({
+  bind,
+  icon,
+  title,
+  focused,
+  closeApp,
+  minimizeApp,
+}) => {
   const getBackground = () => {
     if (focused) return 'header-gradient-focused';
     return 'header-gradient-unfocused';

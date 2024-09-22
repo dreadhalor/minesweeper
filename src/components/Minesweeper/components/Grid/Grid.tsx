@@ -1,7 +1,18 @@
-/* eslint-disable react/prop-types */
+import React from 'react';
 import Cell from './Cell';
 
-const Grid = ({ grid, clickCell, flagCell, status }) => {
+interface GridProps {
+  grid: {
+    val: number;
+    open: number;
+    flagged: number;
+  }[][];
+  clickCell: (row: number, col: number) => void;
+  flagCell: (row: number, col: number) => void;
+  status: string;
+}
+
+const Grid: React.FC<GridProps> = ({ grid, clickCell, flagCell, status }) => {
   return (
     <div
       className='minesweeper-border-colors-inset grid border-[3px]'

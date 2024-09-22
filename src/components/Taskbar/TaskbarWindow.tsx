@@ -1,5 +1,24 @@
-/* eslint-disable react/prop-types */
-const TaskbarWindow = ({ app, focusedApp, taskbarWindowClicked }) => {
+import React from 'react';
+
+interface AppType {
+  id: string;
+  icon: string;
+  title: string;
+  minimized: boolean;
+  order: number;
+}
+
+interface TaskbarWindowProps {
+  app: AppType;
+  focusedApp: string | null;
+  taskbarWindowClicked: (id: string) => void;
+}
+
+const TaskbarWindow: React.FC<TaskbarWindowProps> = ({
+  app,
+  focusedApp,
+  taskbarWindowClicked,
+}) => {
   const focused = focusedApp === app.id;
 
   return (

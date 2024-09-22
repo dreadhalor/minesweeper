@@ -1,9 +1,18 @@
-/* eslint-disable react/prop-types */
+import React from 'react';
 import '../../Minesweeper.scss';
 import DigitDisplay from './DigitDisplay';
 import SmileButton from './SmileButton';
+import { difficultySettings } from '../../../../providers/minesweeper-provider';
 
-const ScoreBar = ({
+interface ScoreBarProps {
+  mines_remaining: number;
+  seconds_elapsed: number;
+  status: 'new' | 'started' | 'won' | 'lost';
+  reset: (difficulty?: keyof typeof difficultySettings) => void;
+  mousedown: boolean;
+}
+
+const ScoreBar: React.FC<ScoreBarProps> = ({
   mines_remaining,
   seconds_elapsed,
   status,

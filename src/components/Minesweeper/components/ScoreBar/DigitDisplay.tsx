@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+import React from 'react';
 import {
   zero,
   one,
@@ -13,27 +13,31 @@ import {
   negative,
 } from '../../../../assets/minesweeper/digits';
 
-const DigitDisplay = ({ num }) => {
-  const digits = {
-    0: zero,
-    1: one,
-    2: two,
-    3: three,
-    4: four,
-    5: five,
-    6: six,
-    7: seven,
-    8: eight,
-    9: nine,
+interface DigitDisplayProps {
+  num: number;
+}
+
+const DigitDisplay: React.FC<DigitDisplayProps> = ({ num }) => {
+  const digits: { [key: string]: string } = {
+    '0': zero,
+    '1': one,
+    '2': two,
+    '3': three,
+    '4': four,
+    '5': five,
+    '6': six,
+    '7': seven,
+    '8': eight,
+    '9': nine,
     '-': negative,
   };
 
-  const getNumString = (num) => {
+  const getNumString = (num: number) => {
     if (num < 0) return `-${padPositiveNum(Math.abs(num), 2)}`;
     return `${padPositiveNum(num, 3)}`;
   };
 
-  const padPositiveNum = (num, digits) => {
+  const padPositiveNum = (num: number, digits: number) => {
     digits = Math.max(Math.floor(digits), 0);
     let result = `${Math.min(Math.floor(num), Math.pow(10, digits) - 1)}`;
     while (result.length < digits) {

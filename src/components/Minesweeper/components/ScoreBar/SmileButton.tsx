@@ -1,9 +1,23 @@
-/* eslint-disable react/prop-types */
+import React from 'react';
 import '../../Minesweeper.scss';
 import { smile, ohh, dead, win } from '../../../../assets/minesweeper/smile';
 import { useAchievements } from 'dread-ui';
+import {
+  difficultySettings,
+  GameStatus,
+} from '../../../../providers/minesweeper-provider';
 
-const SmileButton = ({ reset, status, mousedown }) => {
+interface SmileButtonProps {
+  reset: (difficulty?: keyof typeof difficultySettings) => void;
+  status: GameStatus;
+  mousedown: boolean;
+}
+
+const SmileButton: React.FC<SmileButtonProps> = ({
+  reset,
+  status,
+  mousedown,
+}) => {
   function getSmiley() {
     if (status === 'lost') return <img alt='dead' src={dead} />;
     else if (status === 'won') return <img alt='win' src={win} />;

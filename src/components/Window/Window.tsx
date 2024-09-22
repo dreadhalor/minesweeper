@@ -1,10 +1,30 @@
-/* eslint-disable react/prop-types */
+import React, { useEffect, useRef } from 'react';
 import { useDrag } from '@use-gesture/react';
-import { useEffect, useRef } from 'react';
 import Header from './Header';
 import './Window.scss';
 
-const Window = ({
+interface AppType {
+  id: string;
+  coords: [number, number];
+  icon: string;
+  title: string;
+  order: number;
+  minimized: boolean;
+  ref?: React.RefObject<HTMLDivElement>;
+}
+
+interface WindowProps {
+  children: React.ReactNode;
+  app: AppType;
+  focusedApp: string | null;
+  requestFocus: (id: string | null) => void;
+  background_ref: React.RefObject<HTMLDivElement>;
+  closeApp: (id: string) => void;
+  setApps: React.Dispatch<React.SetStateAction<AppType[]>>;
+  minimizeApp: (id: string) => void;
+}
+
+const Window: React.FC<WindowProps> = ({
   children,
   app,
   focusedApp,
@@ -14,16 +34,16 @@ const Window = ({
   setApps,
   minimizeApp,
 }) => {
-  const window_ref = useRef(null);
+  const window_ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     app.ref = window_ref;
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const bind = useDrag(
     (e) => {
       if (focusedApp !== app.id) requestFocus(app.id);
       setApps((prev_apps) => {
-        // this gets multiplied by 2 in dev but not in prod
         app.coords = [app.coords[0] + e.delta[0], app.coords[1] + e.delta[1]];
         const new_apps = [...prev_apps];
         return new_apps;
