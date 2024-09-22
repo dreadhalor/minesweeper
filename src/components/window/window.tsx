@@ -2,41 +2,20 @@ import React, { useEffect, useRef } from 'react';
 import { useDrag } from '@use-gesture/react';
 import Header from './header';
 import './window.scss';
-
-interface AppType {
-  id: string;
-  coords: [number, number];
-  icon: string;
-  title: string;
-  order: number;
-  minimized: boolean;
-  ref?: React.RefObject<HTMLDivElement>;
-}
+import { AppType, useApp } from '@ms/providers/app-provider';
 
 interface WindowProps {
   children: React.ReactNode;
   app: AppType;
-  focusedApp: string | null;
-  requestFocus: (id: string | null) => void;
-  background_ref: React.RefObject<HTMLDivElement>;
-  closeApp: (id: string) => void;
-  setApps: React.Dispatch<React.SetStateAction<AppType[]>>;
-  minimizeApp: (id: string) => void;
+  backgroundRef: React.RefObject<HTMLDivElement>;
 }
 
-const Window: React.FC<WindowProps> = ({
-  children,
-  app,
-  focusedApp,
-  requestFocus,
-  background_ref,
-  closeApp,
-  setApps,
-  minimizeApp,
-}) => {
-  const window_ref = useRef<HTMLDivElement>(null);
+const Window: React.FC<WindowProps> = ({ children, app, backgroundRef }) => {
+  const { setApps, focusedApp, requestFocus } = useApp();
+
+  const windowRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    app.ref = window_ref;
+    app.ref = windowRef;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -50,7 +29,7 @@ const Window: React.FC<WindowProps> = ({
       });
     },
     {
-      bounds: background_ref,
+      bounds: backgroundRef,
       pointer: {
         capture: false,
       },
@@ -67,7 +46,7 @@ const Window: React.FC<WindowProps> = ({
   return (
     <div
       className='window absolute flex-col'
-      ref={window_ref}
+      ref={windowRef}
       style={{
         ...getAppCoords(),
         zIndex: app.order,
@@ -78,14 +57,7 @@ const Window: React.FC<WindowProps> = ({
         requestFocus(app.id);
       }}
     >
-      <Header
-        bind={bind}
-        icon={app.icon}
-        title={app.title}
-        focused={focused}
-        closeApp={() => closeApp(app.id)}
-        minimizeApp={() => minimizeApp(app.id)}
-      />
+      <Header app={app} bind={bind} />
       <div
         className='border-x-[3px] border-b-[3px] bg-[#ece9d8]'
         style={{

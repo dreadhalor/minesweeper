@@ -7,7 +7,7 @@ import { useAchievements } from 'dread-ui';
 import {
   CellType,
   difficultySettings,
-} from '../../providers/minesweeper-provider';
+} from '@ms/providers/minesweeper-provider';
 
 const Minesweeper = () => {
   const createEmptyGrid = (rows: number, cols: number): CellType[][] => {

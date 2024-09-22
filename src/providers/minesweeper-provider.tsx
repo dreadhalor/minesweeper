@@ -6,6 +6,7 @@ import React, {
   ReactNode,
 } from 'react';
 import { useAchievements } from 'dread-ui';
+import { AppType } from '@ms/providers/app-provider';
 
 export const difficultySettings = {
   beginner: { rows: 9, cols: 9, bombs: 10 },
@@ -22,7 +23,7 @@ export interface CellType {
 export type GameStatus = 'new' | 'started' | 'won' | 'lost';
 
 interface MinesweeperContextProps {
-  closeApp: () => void;
+  app: AppType;
   menuOpen: boolean;
   setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
   guessCount: number;
@@ -52,13 +53,13 @@ export const useMinesweeper = (): MinesweeperContextProps => {
 };
 
 interface MinesweeperProviderProps {
+  app: AppType;
   children: ReactNode;
-  closeApp: () => void;
 }
 
 export const MinesweeperProvider: React.FC<MinesweeperProviderProps> = ({
+  app,
   children,
-  closeApp,
 }) => {
   const createEmptyGrid = (rows: number, cols: number): CellType[][] => {
     const result: CellType[][] = [];
@@ -327,7 +328,7 @@ export const MinesweeperProvider: React.FC<MinesweeperProviderProps> = ({
   };
 
   const contextValue: MinesweeperContextProps = {
-    closeApp,
+    app,
     menuOpen,
     setMenuOpen,
     guessCount,

@@ -13,7 +13,7 @@ import {
   mine,
   mine_death,
   misflagged,
-} from '../../../../assets/minesweeper/cell';
+} from '@ms/assets/minesweeper/cell';
 import './cell.scss';
 
 interface CellProps {

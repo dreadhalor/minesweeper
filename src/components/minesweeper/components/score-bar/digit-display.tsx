@@ -11,7 +11,7 @@ import {
   eight,
   nine,
   negative,
-} from '../../../../assets/minesweeper/digits';
+} from '@ms/assets/minesweeper/digits';
 
 interface DigitDisplayProps {
   num: number;

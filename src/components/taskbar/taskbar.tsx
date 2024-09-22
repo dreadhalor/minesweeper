@@ -1,29 +1,12 @@
-import React from 'react';
 import './taskbar.scss';
 import TaskbarTime from './taskbar-time';
 import TaskbarWindow from './taskbar-window';
-import Start from '../../assets/start.png';
+import Start from '@ms/assets/start.png';
 import { useAchievements } from 'dread-ui';
+import { useApp } from '@ms/providers/app-provider';
 
-interface AppType {
-  id: string;
-  icon: string;
-  title: string;
-  minimized: boolean;
-  order: number;
-}
-
-interface TaskbarProps {
-  apps: AppType[];
-  focusedApp: string | null;
-  taskbarWindowClicked: (id: string) => void;
-}
-
-const Taskbar: React.FC<TaskbarProps> = ({
-  apps,
-  focusedApp,
-  taskbarWindowClicked,
-}) => {
+const Taskbar = () => {
+  const { apps } = useApp();
   const { unlockAchievementById } = useAchievements();
   return (
     <div className='taskbar taskbar-gradient z-10 flex h-[30px] flex-row'>
@@ -34,12 +17,7 @@ const Taskbar: React.FC<TaskbarProps> = ({
         onClick={() => unlockAchievementById('click_start', 'minesweeper')}
       />
       {apps.map((app) => (
-        <TaskbarWindow
-          app={app}
-          focusedApp={focusedApp}
-          taskbarWindowClicked={taskbarWindowClicked}
-          key={app.id}
-        />
+        <TaskbarWindow app={app} key={app.id} />
       ))}
       <TaskbarTime />
     </div>

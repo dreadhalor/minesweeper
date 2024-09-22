@@ -2,7 +2,7 @@ import React from 'react';
 import '../../minesweeper.scss';
 import DigitDisplay from './digit-display';
 import SmileButton from './smile-button';
-import { difficultySettings } from '../../../../providers/minesweeper-provider';
+import { difficultySettings } from '@ms/providers/minesweeper-provider';
 
 interface ScoreBarProps {
   mines_remaining: number;

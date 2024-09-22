@@ -1,24 +1,12 @@
+import { AppType, useApp } from '@ms/providers/app-provider';
 import React from 'react';
-
-interface AppType {
-  id: string;
-  icon: string;
-  title: string;
-  minimized: boolean;
-  order: number;
-}
 
 interface TaskbarWindowProps {
   app: AppType;
-  focusedApp: string | null;
-  taskbarWindowClicked: (id: string) => void;
 }
 
-const TaskbarWindow: React.FC<TaskbarWindowProps> = ({
-  app,
-  focusedApp,
-  taskbarWindowClicked,
-}) => {
+const TaskbarWindow: React.FC<TaskbarWindowProps> = ({ app }) => {
+  const { focusedApp, taskbarWindowClicked } = useApp();
   const focused = focusedApp === app.id;
 
   return (

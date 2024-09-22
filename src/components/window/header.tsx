@@ -1,26 +1,19 @@
 import React from 'react';
 import './window.scss';
 import './header.scss';
+import { AppType, useApp } from '@ms/providers/app-provider';
 
 interface HeaderProps {
+  app: AppType;
   bind: () => React.DOMAttributes<Element>;
-  icon: string;
-  title: string;
-  focused: boolean;
-  closeApp: () => void;
-  minimizeApp: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  bind,
-  icon,
-  title,
-  focused,
-  closeApp,
-  minimizeApp,
-}) => {
+const Header: React.FC<HeaderProps> = ({ app: { id, icon, title }, bind }) => {
+  const { closeApp, minimizeApp, focusedApp } = useApp();
+  const isFocused = focusedApp === id;
+
   const getBackground = () => {
-    if (focused) return 'header-gradient-focused';
+    if (isFocused) return 'header-gradient-focused';
     return 'header-gradient-unfocused';
   };
 
@@ -35,11 +28,11 @@ const Header: React.FC<HeaderProps> = ({
       ></div>
       <div
         className='header-gradient-left absolute bottom-0 left-0 top-0 w-[15px]'
-        style={{ opacity: focused ? 1 : 0.4 }}
+        style={{ opacity: isFocused ? 1 : 0.4 }}
       ></div>
       <div
         className='header-gradient-right absolute bottom-0 right-0 top-0 w-[15px]'
-        style={{ opacity: focused ? 1 : 0.4 }}
+        style={{ opacity: isFocused ? 1 : 0.4 }}
       ></div>
 
       <div className='header-buttons-container absolute bottom-0 left-0 right-0 flex h-[25px] flex-row items-center px-[3px] pb-[1px]'>
@@ -64,12 +57,12 @@ const Header: React.FC<HeaderProps> = ({
         >
           {title}
         </div>
-        <div className='flex flex-row' style={{ opacity: focused ? 1 : 0.6 }}>
+        <div className='flex flex-row' style={{ opacity: isFocused ? 1 : 0.6 }}>
           <div
             className='header_button header__button--minimize'
             onClick={(e) => {
               e.preventDefault();
-              minimizeApp();
+              minimizeApp(id);
             }}
           ></div>
           <div className='header_button header__button--maximize header__button--disable'></div>
@@ -77,7 +70,7 @@ const Header: React.FC<HeaderProps> = ({
             className='header_button header__button--close'
             onClick={(e) => {
               e.preventDefault();
-              closeApp();
+              closeApp(id);
             }}
           ></div>
         </div>

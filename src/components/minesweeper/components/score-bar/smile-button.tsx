@@ -1,11 +1,11 @@
 import React from 'react';
 import '../../minesweeper.scss';
-import { smile, ohh, dead, win } from '../../../../assets/minesweeper/smile';
+import { smile, ohh, dead, win } from '@ms/assets/minesweeper/smile';
 import { useAchievements } from 'dread-ui';
 import {
   difficultySettings,
   GameStatus,
-} from '../../../../providers/minesweeper-provider';
+} from '@ms/providers/minesweeper-provider';
 
 interface SmileButtonProps {
   reset: (difficulty?: keyof typeof difficultySettings) => void;

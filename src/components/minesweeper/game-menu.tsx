@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { cn } from '@repo/utils';
-import Checkmark from '../../assets/minesweeper/icons/checked.png';
+import Checkmark from '@ms/assets/minesweeper/icons/checked.png';
 import {
   useMinesweeper,
   CellType,
   difficultySettings,
-} from '../../providers/minesweeper-provider';
+} from '@ms/providers/minesweeper-provider';
+import { useApp } from '@ms/providers/app-provider';
 
 type GameMenuItemDropdownItemProps = {
   children: React.ReactNode;
@@ -82,7 +83,8 @@ const GameMenuItem = ({
   const difficulty =
     cols === 9 ? 'beginner' : cols === 16 ? 'intermediate' : 'expert';
 
-  const { closeApp } = useMinesweeper();
+  const { app } = useMinesweeper();
+  const { closeApp } = useApp();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -138,7 +140,7 @@ const GameMenuItem = ({
           Expert
         </GameMenuItemDropdownItem>
         <GameMenuItemDropdownSeparator />
-        <GameMenuItemDropdownItem onSelected={() => closeApp()}>
+        <GameMenuItemDropdownItem onSelected={() => closeApp(app.id)}>
           Exit
         </GameMenuItemDropdownItem>
       </GameMenuItemDropdown>
