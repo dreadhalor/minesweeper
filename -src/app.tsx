@@ -1,11 +1,11 @@
 import minesweeper_icon from './assets/minesweeper/minesweeper-icon.png';
 import React, { useEffect, useRef, useState } from 'react';
-import './App.scss';
+import './app.scss';
 import { useDrag } from '@use-gesture/react';
-import Icon from './components/Icon';
-import Window from './components/Window/Window';
-import Minesweeper from './components/Minesweeper/Minesweeper';
-import Taskbar from './components/Taskbar/Taskbar';
+import Icon from './components/icon';
+import Window from './components/window/window';
+import Minesweeper from './components/minesweeper/minesweeper';
+import Taskbar from './components/taskbar/taskbar';
 import { v4 as uuidv4 } from 'uuid';
 import { UserMenu, Card, CardContent, useAchievements } from 'dread-ui';
 import { MinesweeperProvider } from './providers/minesweeper-provider';
@@ -20,7 +20,7 @@ interface AppType {
   ref?: React.RefObject<HTMLDivElement>;
 }
 
-const App: React.FC = () => {
+const App = () => {
   const { unlockAchievementById } = useAchievements();
   const background_ref = useRef<HTMLDivElement>(null);
   const [selectionCoords, setSelectionCoords] = useState<

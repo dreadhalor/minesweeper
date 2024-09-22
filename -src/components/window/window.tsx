@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useDrag } from '@use-gesture/react';
-import Header from './Header';
-import './Window.scss';
+import Header from './header';
+import './window.scss';
 
 interface AppType {
   id: string;

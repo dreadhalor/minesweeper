@@ -1,6 +1,6 @@
 import React from 'react';
-import './Window.scss';
-import './Header.scss';
+import './window.scss';
+import './header.scss';
 
 interface HeaderProps {
   bind: () => React.DOMAttributes<Element>;

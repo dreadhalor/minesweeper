@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../Minesweeper.scss';
+import '../../minesweeper.scss';
 import { smile, ohh, dead, win } from '../../../../assets/minesweeper/smile';
 import { useAchievements } from 'dread-ui';
 import {

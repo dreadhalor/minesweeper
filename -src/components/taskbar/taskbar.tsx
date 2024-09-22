@@ -1,7 +1,7 @@
 import React from 'react';
-import './Taskbar.scss';
-import TaskbarTime from './TaskbarTime';
-import TaskbarWindow from './TaskbarWindow';
+import './taskbar.scss';
+import TaskbarTime from './taskbar-time';
+import TaskbarWindow from './taskbar-window';
 import Start from '../../assets/start.png';
 import { useAchievements } from 'dread-ui';
 

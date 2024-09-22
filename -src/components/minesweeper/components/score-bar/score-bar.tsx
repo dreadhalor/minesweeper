@@ -1,7 +1,7 @@
 import React from 'react';
-import '../../Minesweeper.scss';
-import DigitDisplay from './DigitDisplay';
-import SmileButton from './SmileButton';
+import '../../minesweeper.scss';
+import DigitDisplay from './digit-display';
+import SmileButton from './smile-button';
 import { difficultySettings } from '../../../../providers/minesweeper-provider';
 
 interface ScoreBarProps {
