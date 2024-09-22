@@ -2,6 +2,8 @@
 
 ![App Screenshot](./src/assets/screenshot.webp)
 
+[View Demo](https://scottjhetrick.com/#/minesweeper)
+
 Welcome to **Minesweeper**, a sophisticated and feature-rich implementation of the classic Minesweeper game built using React and Vite. This application is an integral part of a larger monorepo, leveraging shared systems such as the **dread-ui** component library and an **Achievements System** to enhance functionality and user engagement.
 
 ## Table of Contents
